@@ -1,74 +1,6 @@
-// Desktop navigation
-const navToggle = document.querySelector("[data-nav-toggle]");
-const nav = document.querySelector("[data-nav]");
 
-if (navToggle && nav) {
-  navToggle.addEventListener("click", () => {
-    const isOpen = nav.classList.toggle("is-open");
-    navToggle.setAttribute("aria-expanded", String(isOpen));
-    
-    // Close all submenus when closing main menu
-    if (!isOpen) {
-      document.querySelectorAll(".nav-item.is-open").forEach((item) => {
-        item.classList.remove("is-open");
-      });
-      document.querySelectorAll("[data-submenu-toggle]").forEach((toggle) => {
-        toggle.setAttribute("aria-expanded", "false");
-      });
-    }
-    
-    // Prevent body scroll when menu is open on mobile
-    if (window.innerWidth <= 960) {
-      document.body.style.overflow = isOpen ? "hidden" : "";
-    }
-  });
-}
 
-document.querySelectorAll("[data-submenu-toggle]").forEach((toggle) => {
-  toggle.addEventListener("click", (e) => {
-    e.stopPropagation();
-    const item = toggle.closest(".nav-item");
-    if (!item) return;
-    
-    const isOpen = item.classList.toggle("is-open");
-    toggle.setAttribute("aria-expanded", String(isOpen));
-    
-    // Close other submenus at the same level
-    if (isOpen) {
-      const parent = item.parentElement;
-      if (parent) {
-        parent.querySelectorAll(".nav-item.is-open").forEach((sibling) => {
-          if (sibling !== item) {
-            sibling.classList.remove("is-open");
-            const siblingToggle = sibling.querySelector("[data-submenu-toggle]");
-            if (siblingToggle) {
-              siblingToggle.setAttribute("aria-expanded", "false");
-            }
-          }
-        });
-      }
-    }
-  });
-});
 
-// Close menu when clicking outside
-document.addEventListener("click", (e) => {
-  if (nav && nav.classList.contains("is-open")) {
-    if (!nav.contains(e.target) && !navToggle.contains(e.target)) {
-      nav.classList.remove("is-open");
-      navToggle.setAttribute("aria-expanded", "false");
-      document.body.style.overflow = "";
-      
-      // Close all submenus
-      document.querySelectorAll(".nav-item.is-open").forEach((item) => {
-        item.classList.remove("is-open");
-      });
-      document.querySelectorAll("[data-submenu-toggle]").forEach((toggle) => {
-        toggle.setAttribute("aria-expanded", "false");
-      });
-    }
-  }
-});
 
 // Mobile bottom navigation
 const mobileMenuToggle = document.getElementById("mobile-menu-toggle");
@@ -76,39 +8,46 @@ const mobileMenuOverlay = document.getElementById("mobile-menu-overlay");
 const mobileMenuClose = document.getElementById("mobile-menu-close");
 const mobileMenuContent = document.getElementById("mobile-menu-content");
 
-// Function to render mobile menu
+// Function to render mobile menu from menu_items data
 function renderMobileMenu() {
   if (!mobileMenuContent) return;
   
-  const siteNav = document.querySelector("#site-nav");
-  if (!siteNav) return;
+  // Get menu items from global variable or create default menu
+  const menuItems = window.menuItems || [
+    { title: "Головна", url: "/", children: [] },
+    { title: "Про коледж", url: "#", children: [
+      { title: "Історія", url: "/history" },
+      { title: "Адміністрація", url: "/admin" },
+      { title: "Викладачі", url: "/teachers" }
+    ]},
+    { title: "Новини", url: "/articles", children: [] },
+    { title: "Вступ", url: "/admissions-2026", children: [
+      { title: "Правила прийому", url: "/admission-rules" },
+      { title: "Спеціальності", url: "/specialties" }
+    ]},
+    { title: "Студентам", url: "#", children: [
+      { title: "Розклад", url: "/schedule" },
+      { title: "Бібліотека", url: "/library" }
+    ]}
+  ];
   
   let mobileHTML = '';
   
-  // Get all menu items and convert to mobile format
-  const menuItems = siteNav.querySelectorAll('.nav-item, .site-nav > a');
-  
   menuItems.forEach(item => {
-    const isNavItem = item.classList.contains('nav-item');
-    const hasSubmenu = isNavItem && item.classList.contains('has-submenu');
-    const title = isNavItem ? item.querySelector('.nav-title')?.textContent : item.textContent;
-    const url = isNavItem ? '#' : item.getAttribute('href');
-    const isActive = item.classList.contains('nav-highlight') || item.querySelector('.nav-highlight');
+    const hasSubmenu = item.children && item.children.length > 0;
+    const isActive = window.activeTitle === item.title;
     
     if (hasSubmenu) {
       mobileHTML += `
         <div class="mobile-nav-group">
-          <div class="mobile-nav-group-title">${title}</div>
+          <div class="mobile-nav-group-title">${item.title}</div>
           <div class="mobile-submenu">
       `;
       
-      const submenuLinks = item.querySelectorAll('.submenu a');
-      submenuLinks.forEach(link => {
-        const linkText = link.textContent;
-        const linkUrl = link.getAttribute('href');
-        const linkActive = link.classList.contains('nav-highlight');
+      item.children.forEach(child => {
+        const childActive = window.activeTitle === child.title;
         mobileHTML += `
-          <a href="${linkUrl}" class="mobile-nav-link ${linkActive ? 'active' : ''}">${linkText}</a>
+          <a href="${child.url}" class="mobile-nav-link ${childActive ? 'active' : ''}">${child.title}</a>
         `;
       });
       
@@ -116,9 +55,9 @@ function renderMobileMenu() {
           </div>
         </div>
       `;
-    } else if (!isNavItem || title) {
+    } else {
       mobileHTML += `
-        <a href="${url}" class="mobile-nav-link ${isActive ? 'active' : ''}">${title}</a>
+        <a href="${item.url}" class="mobile-nav-link ${isActive ? 'active' : ''}">${item.title}</a>
       `;
     }
   });
@@ -157,8 +96,6 @@ if (mobileMenuOverlay) {
 window.addEventListener("resize", () => {
   if (window.innerWidth > 960) {
     document.body.style.overflow = "";
-    if (nav) nav.classList.remove("is-open");
-    if (navToggle) navToggle.setAttribute("aria-expanded", "false");
     if (mobileMenuOverlay) mobileMenuOverlay.classList.remove("is-open");
   }
 });

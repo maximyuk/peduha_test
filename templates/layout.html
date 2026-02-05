@@ -50,18 +50,6 @@
             >
           </div>
         </div>
-        <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav">
-          <span class="nav-toggle-box">
-            <span class="nav-toggle-line"></span>
-            <span class="nav-toggle-line"></span>
-            <span class="nav-toggle-line"></span>
-          </span>
-          <span class="nav-toggle-label">Меню</span>
-        </button>
-        <nav class="site-nav" id="site-nav" data-nav>
-          {% from "_menu.html" import render_menu %}
-          {{ render_menu(menu_items, active_title) }}
-        </nav>
       </div>
 
       <!-- Mobile Bottom Navigation -->
@@ -156,6 +144,11 @@
       </div>
     </footer>
 
+<script>
+      // Pass menu data to JavaScript
+      window.menuItems = {{ menu_items|tojson|safe }};
+      window.activeTitle = {{ active_title|tojson|safe }};
+    </script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
   </body>
 </html>
