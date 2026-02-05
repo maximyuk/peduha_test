@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}ВПФК — Офіційний сайт коледжу{% endblock %}</title>
+    <meta
+      name="description"
+      content="Офіційний сайт коледжу: вступ, новини, події, підготовчі курси, електронна бібліотека та публічна інформація."
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Перейти до основного контенту</a>
+
+    <header class="site-header">
+      <div class="topbar">
+        <div class="container topbar-inner">
+          <span class="topbar-note">Офіційний сайт коледжу</span>
+          <div class="topbar-actions">
+            <button class="chip" type="button">UA</button>
+            <button class="chip" type="button">EN</button>
+            <a class="chip ghost" href="#">Пошук</a>
+            {% if current_user %}
+              <a class="chip ghost" href="{{ url_for('admin_dashboard') }}">Панель</a>
+              <a class="chip ghost" href="{{ url_for('logout') }}">Вийти</a>
+            {% else %}
+              <a class="chip ghost" href="{{ url_for('login') }}">Вхід</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+<div class="container nav-wrapper">
+        <div class="brand">
+          <div class="logo-mark is-fallback">
+            <img
+              src="{{ url_for('static', filename='images/logo.png') }}"
+              alt="??????? ????"
+              onload="this.closest('.logo-mark').classList.remove('is-fallback')"
+              onerror="if(!this.dataset.fallback){this.dataset.fallback='1'; this.src='/images/logo.png'; return;} this.closest('.logo-mark').classList.add('is-fallback'); this.remove();"
+            />
+            <span class="logo-fallback">????</span>
+          </div>
+          <div class="brand-text">
+            <span class="brand-title">ВПФК</span>
+            <span class="brand-subtitle"
+              >Володимирський педагогічний фаховий коледж імені Агатангела
+              Кримського</span
+            >
+          </div>
+        </div>
+        <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav">
+          <span class="nav-toggle-box">
+            <span class="nav-toggle-line"></span>
+            <span class="nav-toggle-line"></span>
+            <span class="nav-toggle-line"></span>
+          </span>
+          <span class="nav-toggle-label">Меню</span>
+        </button>
+        <nav class="site-nav" id="site-nav" data-nav>
+          {% from "_menu.html" import render_menu %}
+          {{ render_menu(menu_items, active_title) }}
+        </nav>
+      </div>
+
+      <!-- Mobile Bottom Navigation -->
+      <nav class="mobile-nav" id="mobile-nav">
+        <div class="mobile-nav-inner">
+          <a href="/" class="mobile-nav-item {% if active_title == 'Головна' %}active{% endif %}">
+            <div class="mobile-nav-icon">🏠</div>
+            <span>Головна</span>
+          </a>
+          <a href="/articles" class="mobile-nav-item {% if 'Новини' in active_title %}active{% endif %}">
+            <div class="mobile-nav-icon">📰</div>
+            <span>Новини</span>
+          </a>
+          <a href="/admissions-2026" class="mobile-nav-item {% if 'Вступ' in active_title %}active{% endif %}">
+            <div class="mobile-nav-icon">🎓</div>
+            <span>Вступ</span>
+          </a>
+          <button class="mobile-nav-item mobile-nav-more" type="button" id="mobile-menu-toggle">
+            <div class="mobile-nav-icon">☰</div>
+            <span>Більше</span>
+          </button>
+        </div>
+      </nav>
+
+      <!-- Mobile Menu Overlay -->
+      <div class="mobile-menu-overlay" id="mobile-menu-overlay">
+        <div class="mobile-menu-panel">
+          <div class="mobile-menu-header">
+            <h3 class="mobile-menu-title">Меню</h3>
+            <button class="mobile-menu-close" type="button" id="mobile-menu-close">×</button>
+          </div>
+          <div class="mobile-menu-content" id="mobile-menu-content">
+            <!-- Mobile menu content will be inserted here by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-wrap">
+          <div class="container flash-messages">
+            {% for category, message in messages %}
+              <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <main id="main">
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <div class="brand footer-brand">
+            <div class="logo-mark is-fallback">
+            <img
+              src="{{ url_for('static', filename='images/logo.png') }}"
+              alt="??????? ????"
+              onload="this.closest('.logo-mark').classList.remove('is-fallback')"
+              onerror="if(!this.dataset.fallback){this.dataset.fallback='1'; this.src='/images/logo.png'; return;} this.closest('.logo-mark').classList.add('is-fallback'); this.remove();"
+            />
+            <span class="logo-fallback">????</span>
+          </div>
+            <div class="brand-text">
+              <span class="brand-title">ВПФК</span>
+              <span class="brand-subtitle"
+                >Володимирський педагогічний фаховий коледж імені Агатангела
+                Кримського</span
+              >
+            </div>
+          </div>
+          <p class="footer-note">
+            Адреса: вул. Освітня, 12, м. Володимир · Тел: +38 (000) 000-00-00
+          </p>
+        </div>
+        <div class="footer-logos">
+          <div class="logo-tile">МОН</div>
+          <div class="logo-tile">ДПА</div>
+          <div class="logo-tile">OSVITA</div>
+          <div class="logo-tile">EDEBO</div>
+        </div>
+        <div class="footer-links">
+          <a href="#">Публічна інформація</a>
+          <a href="#">Електронна бібліотека</a>
+          <a href="#">Політика конфіденційності</a>
+          <a href="#">Контакти</a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  </body>
+</html>
